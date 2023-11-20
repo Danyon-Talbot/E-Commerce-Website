@@ -15,7 +15,7 @@ Tag.init(
     },
     tag_name: {
       type: DataTypes.STRING,
-      allowNull: false,
+      // allowNull: false, // This is not marked as required. May cause problems, remove if needed.
     },
   },
   {

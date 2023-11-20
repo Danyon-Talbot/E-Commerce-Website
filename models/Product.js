@@ -38,7 +38,7 @@ Product.init(
     },
     category_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      // allowNull: false, // This is not marked as required. May cause problems, remove if needed.
       references: {
         model: 'category',
         key: 'id',
