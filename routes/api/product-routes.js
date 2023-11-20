@@ -4,16 +4,38 @@ const { Product, Category, Tag, ProductTag } = require('../../models');
 // The `/api/products` endpoint
 
 // get all products
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   // find all products
   // be sure to include its associated Category and Tag data
+  try {
+    const productData = await Product.findAll({
+      include: [{ model: Category }, { model: Tag }],
+    });
+    res.status(200).json(productData);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 // get one product
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   // find a single product by its `id`
   // be sure to include its associated Category and Tag data
+  try {
+    const productId = req.params.id; // Gets the product id from the request params
+    const productData = await Product.findByPk(productId, {
+      include: [{ model: Category }, { model: Tag }],
+    });
+    if (!productData) {
+      // Checks if productData is null, returns an error message
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    res.status(200).json(productData);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
+
 
 // create new product
 router.post('/', (req, res) => {
@@ -94,6 +116,26 @@ router.put('/:id', (req, res) => {
 
 router.delete('/:id', (req, res) => {
   // delete one product by its `id` value
+  const productId = req.params.id;
+  Product.destroy({
+    where: {
+      id: productId,
+    },
+  })
+    .then((deletedProduct) => {
+      if (deletedProduct === 0) {
+        // If no product was deleted, respond with a 404 status and a message
+        res.status(404).json({ message: 'Product not found' });
+      } else {
+        // If the product was successfully deleted, respond with a 200 status
+        res.status(200).json({ message: 'Product deleted successfully' });
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json(err);
+    });
 });
+
 
 module.exports = router;
